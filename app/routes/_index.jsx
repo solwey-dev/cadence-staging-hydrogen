@@ -18,6 +18,7 @@ export async function loader({context}) {
 
 export default function Homepage() {
   const data = useLoaderData();
+  console.log(data);
   return (
     <div className="home">
       <FeaturedCollection collection={data.featuredCollection} />
@@ -52,7 +53,7 @@ function RecommendedProducts({products}) {
         <Await resolve={products}>
           {({products}) => (
             <div className="recommended-products-grid">
-              {products.nodes.map((product) => (
+              {products.nodes.slice(-8).map((product) => (
                 <Link
                   key={product.id}
                   className="recommended-product"
@@ -90,10 +91,15 @@ const FEATURED_COLLECTION_QUERY = `#graphql
       height
     }
     handle
+    products(first: 8) {
+      nodes {
+        id
+      }
+    }
   }
   query FeaturedCollection($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    collections(first: 1, sortKey: UPDATED_AT, reverse: true) {
+    collections(first: 2, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...FeaturedCollection
       }
@@ -124,7 +130,7 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   }
   query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 10, sortKey: UPDATED_AT) {
       nodes {
         ...RecommendedProduct
       }
